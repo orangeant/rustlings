@@ -11,8 +11,6 @@ struct Person {
     age: usize,
 }
 
-// I AM NOT DONE
-
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
 // 2. Split the given string on the commas present in it
@@ -23,12 +21,39 @@ struct Person {
 // 5. If while extracting the name and the age something goes wrong, an error should be returned
 // If everything goes well, then return a Result of a Person object
 
+// impl FromStr for Person {
+//     type Err = Box<dyn error::Error>;
+//     fn from_str(s: &str) -> Result<Person, Self::Err> {
+//         if s.len() == 0 {
+//             return Err("Empty string")?;
+//         }
+//         let v: Vec<_> = s.split(",").collect();
+//         if v.len() != 2 {
+//             return Err("error")?;
+//         }
+//         let name = if v.len() == 2 && v[0]!= "" {
+//             String::from(v[0])
+//         } else {
+//             return Err("empty name")?;
+//         };
+//         let age = v[1].parse::<usize>()?;
+//         Ok(Person { name, age })
+//     }
+// }
+
 impl FromStr for Person {
     type Err = Box<dyn error::Error>;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.len() == 0 {
+            return Err("Empty string")?;
+        }
+        let v: Vec<_> = s.split(",").collect();
+        match v.as_slice() {
+            [name, age] if name.len() != 0 => Ok(Person{name: name.to_string(), age: age.parse::<usize>()?}),
+            _ => Err("error parsing")?
+        }
     }
 }
-
 fn main() {
     let p = "Mark,20".parse::<Person>().unwrap();
     println!("{:?}", p);
